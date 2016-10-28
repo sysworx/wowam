@@ -5,5 +5,15 @@ A World of Warcraft Addon Manager written in Xojo. We actually asked at curse su
 
 # Installation
 
-Our World of Warcraft Addon Manager is in development now, code will be releasen when its ready.
+Our World of Warcraft Addon Manager is in development now, code will be releasen when its ready. You will need Microsoft Visual C++ 2015 (x86) Runtime to the tool on Windows.
+
+# Bugs
+
+Please keep in mind that Warcraft Addon Manager is released as development version at this time, so there can be many bugs. Please report them and help us to improve the software.
+
+# Updates
+
+Warcraft Addon Manager has an integrated updater system, which will update it to the newest version if you want.
+
+# Homepage
 https://www.sys-worx.net/wow-addon-manager/
