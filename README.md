@@ -1,5 +1,7 @@
 # wowam
-A World of Warcraft Addon Manager
+A World of Warcraft Addon Manager written in Xojo. We actually asked at curse support that third party clients are allowed. So Hellfir3 said was long as they are not malicious its ok.
+
+![alt text](https://www.sys-worx.net/wp-content/uploads/2016/10/wowam.png "World of Warcraft Addon Manager")
 
 # Installation
 
