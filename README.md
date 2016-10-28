@@ -5,7 +5,9 @@ A World of Warcraft Addon Manager written in Xojo. We actually asked at curse su
 
 # Installation
 
-Our World of Warcraft Addon Manager is in development now, code will be releasen when its ready. You will need Microsoft Visual C++ 2015 (x86) Runtime to the tool on Windows.
+Our World of Warcraft Addon Manager is in development now, code will be releasen when its ready. You will need Microsoft Visual C++ 2015 (x86) Runtime to run the tool on Windows.
+
+https://github.com/sysworx/wowam/releases
 
 # Bugs
 
