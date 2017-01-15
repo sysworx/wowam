@@ -281,7 +281,7 @@ End
 		        Dim result As String
 		        sender.SetFormData(senddata)
 		        PreferencesModule.Log("Edit", "Send data to the WOWAM-Cloud: " + AddonName + " / " + url)
-		        result = sender.Post("",5) // Synchronous
+		        result = sender.Post(app.swAddonsURL,5) // Synchronous
 		        PreferencesModule.Log("Edit", "Changed url to: " + txt_url.Text)
 		        PreferencesModule.Log("Edit", "-------- End Edit Procedure for " + main.listbox1.Cell(listboxRow,0) + " -------------------")
 		        'close form

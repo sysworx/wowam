@@ -1,51 +1,5 @@
 #tag BuildAutomation
 			Begin BuildStepList Linux
-				Begin CopyFilesBuildStep CopyFiles11
-					AppliesTo = 0
-					Destination = 0
-					Subdirectory = 
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1lcnJvcmhhbmRsaW5nLWwxLTEtMC5kbGw=
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1maWxlLWwxLTEtMC5kbGw=
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1maWxlLWwxLTItMC5kbGw=
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1maWxlLWwyLTEtMC5kbGw=
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1oYW5kbGUtbDEtMS0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1oZWFwLWwxLTEtMC5kbGw=
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1pbnRlcmxvY2tlZC1sMS0xLTAuZGxs
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1saWJyYXJ5bG9hZGVyLWwxLTEtMC5kbGw=
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1sb2NhbGl6YXRpb24tbDEtMi0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1tZW1vcnktbDEtMS0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1uYW1lZHBpcGUtbDEtMS0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1wcm9jZXNzZW52aXJvbm1lbnQtbDEtMS0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1wcm9jZXNzdGhyZWFkcy1sMS0xLTAuZGxs
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1wcm9jZXNzdGhyZWFkcy1sMS0xLTEuZGxs
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1wcm9maWxlLWwxLTEtMC5kbGw=
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1ydGxzdXBwb3J0LWwxLTEtMC5kbGw=
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1zdHJpbmctbDEtMS0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1zeW5jaC1sMS0xLTAuZGxs
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1zeW5jaC1sMS0yLTAuZGxs
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1zeXNpbmZvLWwxLTEtMC5kbGw=
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS10aW1lem9uZS1sMS0xLTAuZGxs
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS11dGlsLWwxLTEtMC5kbGw=
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LWNvbmlvLWwxLTEtMC5kbGw=
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LWNvbnZlcnQtbDEtMS0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LWVudmlyb25tZW50LWwxLTEtMC5kbGw=
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LWZpbGVzeXN0ZW0tbDEtMS0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LWhlYXAtbDEtMS0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LWxvY2FsZS1sMS0xLTAuZGxs
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LW1hdGgtbDEtMS0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LW11bHRpYnl0ZS1sMS0xLTAuZGxs
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LXByaXZhdGUtbDEtMS0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LXByb2Nlc3MtbDEtMS0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LXJ1bnRpbWUtbDEtMS0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LXN0ZGlvLWwxLTEtMC5kbGw=
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LXN0cmluZy1sMS0xLTAuZGxs
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LXRpbWUtbDEtMS0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY3J0LXV0aWxpdHktbDEtMS0wLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L3VjcnRiYXNlLmRsbA==
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1jb25zb2xlLWwxLTEtMC5kbGw=
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1kYXRldGltZS1sMS0xLTAuZGxs
-					FolderItem = Li4vLi4vLi4vLi4vLi4vVG9vbHMvWG9qby9FeHRyYXMvV2luZG93cyUyMFJ1bnRpbWUvRmlsZXMveDg2L2FwaS1tcy13aW4tY29yZS1kZWJ1Zy1sMS0xLTAuZGxs
-				End
 				Begin BuildProjectStep Build
 				End
 			End
@@ -55,6 +9,25 @@
 			End
 			Begin BuildStepList Windows
 				Begin BuildProjectStep Build
+				End
+				Begin IDEScriptBuildStep Sign , AppliesTo = 2
+					'CodeSign
+					if (not TargetWindows) then
+					return
+					end if
+					
+					Dim sPROJECT as String = ProjectShellPath
+					Dim n as integer = len(sPROJECT) - 11 'projectname
+					Dim sSIGN as String = sPROJECT.Left(n) + "sign\"
+					Dim sPROJECT_PATH As String = "$PROJECT_PATH"
+					Dim sBUILD_LOCATION As String = CurrentBuildLocation
+					Dim sBUILD_APPNAME As String = CurrentBuildAppName
+					Dim sBUILD_EXE as String = CurrentBuildLocation + "\" +sBUILD_APPNAME
+					
+					Dim sShellResult As String
+					sShellResult = DoShellCommand(sSIGN + "signtool.exe sign /f " + sSIGN +"\cert.p12 /p Start6916 " + sBUILD_EXE)
+					Print "Sign Result: " + sShellResult
+					
 				End
 			End
 #tag EndBuildAutomation

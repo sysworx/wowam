@@ -7,20 +7,19 @@ Inherits HttpSecureSocket
 		  main.lblState.text = "Extracting " + main.listbox1.Cell(i,0)
 		  main.proBar.Value = main.proBar.Value +1
 		  main.loadcount = main.loadcount + 1
-		  
-		  Dim addonPath as FolderItem = GetFolderItem(Preferences.addonpath)
-		  
+		  'get addon path from pref
+		  Dim addonPath as FolderItem = GetFolderItem(DecodeBase64(Preferences.addonpath))
+		  'write logfile
 		  PreferencesModule.Log("Update", "Download Complete: " + url + httpStatus.ToText)
 		  PreferencesModule.Log("Update", "Extracting addon to: " + addonPath.NativePath)
-		  
+		  'extract the downloaded addon to addonPath
 		  Dim zipper as new Kaju.ZipShell
 		  zipper.Decompress(zipFile, addonPath)
 		  main.listbox1.Cell(i,1) = main.listbox1.Cell(i,2)  
 		  main.listbox1.RowPicture(i) = resources.toPic(resources.icon_cell_ok16)
 		  PreferencesModule.Log("Update", "-------- End Download Procedure for " + main.listbox1.Cell(i,0) + " -----------------")
 		  main.lblState.text = ""
-		  
-		  
+		  'reset the gui
 		  if main.loadcount = main.updateCount then
 		    main.tb_main.tb_refresh.Enabled = true
 		    main.tb_main.tb_update.Enabled = false
@@ -42,6 +41,12 @@ Inherits HttpSecureSocket
 	#tag EndEvent
 
 	#tag Event
+		Sub HeadersReceived(headers as internetHeaders, httpStatus as integer)
+		  system.DebugLog("HEADERS " + main.listbox1.Cell(i,0) + " " + headers.Source)
+		End Sub
+	#tag EndEvent
+
+	#tag Event
 		Function ProxyAuthenticationRequired(Realm As String, Headers As InternetHeaders, ByRef Name As String, ByRef Password As String) As Boolean
 		  Name = app.proxy_user
 		  Password = app.proxy_password
@@ -51,9 +56,8 @@ Inherits HttpSecureSocket
 
 	#tag Event
 		Sub ReceiveProgress(bytesReceived as integer, totalBytes as integer, newData as string)
-		  'to enable contextmenu
+		  'set state while downloading
 		  main.Listbox1.Enabled = false
-		  
 		  main.lblState.text = "Downloading " + main.listbox1.Cell(i,0)
 		  
 		End Sub

@@ -36,5 +36,10 @@ Begin Toolbar toolbar_main
 		HelpTag = ""
 		Style = 0
 	End
+	Begin ToolButton tb_curse
+		Caption = "Support Curse"
+		HelpTag = ""
+		Style = 0
+	End
 End
 #tag EndToolbar

@@ -87,7 +87,7 @@ Begin Window about
       Transparent     =   True
       Underline       =   False
       Visible         =   True
-      Width           =   420
+      Width           =   430
    End
    Begin Label lbl_version
       AutoDeactivate  =   True
@@ -124,7 +124,7 @@ Begin Window about
       Visible         =   True
       Width           =   420
    End
-   Begin Label lvl_copy
+   Begin Label lbl_copy
       AutoDeactivate  =   True
       Bold            =   False
       DataField       =   ""
@@ -159,7 +159,7 @@ Begin Window about
       Visible         =   True
       Width           =   420
    End
-   Begin Label lvl_copy1
+   Begin Label lbl_license
       AutoDeactivate  =   True
       Bold            =   False
       DataField       =   ""
@@ -205,7 +205,7 @@ Begin Window about
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   20
+      Left            =   111
       LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   True
@@ -219,7 +219,7 @@ Begin Window about
       TabStop         =   True
       Text            =   "configPath"
       TextAlign       =   0
-      TextColor       =   &c00000000
+      TextColor       =   &c00008000
       TextFont        =   "System"
       TextSize        =   12.0
       TextUnit        =   0
@@ -227,7 +227,7 @@ Begin Window about
       Transparent     =   True
       Underline       =   False
       Visible         =   True
-      Width           =   420
+      Width           =   469
    End
    Begin TabPanel TabPanel1
       AutoDeactivate  =   True
@@ -435,6 +435,41 @@ Begin Window about
       Visible         =   True
       Width           =   80
    End
+   Begin Label lbl_config
+      AutoDeactivate  =   True
+      Bold            =   False
+      DataField       =   ""
+      DataSource      =   ""
+      Enabled         =   True
+      Height          =   18
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   20
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   False
+      LockTop         =   True
+      Multiline       =   True
+      Scope           =   0
+      Selectable      =   False
+      TabIndex        =   10
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Text            =   "Config-Path:"
+      TextAlign       =   0
+      TextColor       =   &c00000000
+      TextFont        =   "System"
+      TextSize        =   12.0
+      TextUnit        =   0
+      Top             =   441
+      Transparent     =   True
+      Underline       =   False
+      Visible         =   True
+      Width           =   79
+   End
 End
 #tag EndWindow
 
@@ -460,7 +495,7 @@ End
 		  
 		  'set configpath
 		  
-		  lbl_configPath.text = "Config-Path: " + SpecialFolder.ApplicationData.Child(PreferencesModule.gAppName).NativePath
+		  lbl_configPath.text = SpecialFolder.ApplicationData.Child(PreferencesModule.gAppName).NativePath
 		End Sub
 	#tag EndEvent
 
@@ -472,6 +507,18 @@ End
 		Sub Open()
 		  'Set images
 		  can_title.Backdrop = resources.toPic(resources.icon_app128)
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events lbl_configPath
+	#tag Event
+		Function MouseDown(X As Integer, Y As Integer) As Boolean
+		  return true
+		End Function
+	#tag EndEvent
+	#tag Event
+		Sub MouseUp(X As Integer, Y As Integer)
+		  helper.pathOpen(SpecialFolder.ApplicationData.Child(PreferencesModule.gAppName))
 		End Sub
 	#tag EndEvent
 #tag EndEvents

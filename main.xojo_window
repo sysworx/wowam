@@ -21,7 +21,7 @@ Begin Window main
    MinHeight       =   64
    MinimizeButton  =   False
    MinWidth        =   64
-   Placement       =   2
+   Placement       =   0
    Resizeable      =   True
    Title           =   "WoW Addon Manager"
    Visible         =   True
@@ -49,7 +49,7 @@ Begin Window main
       Hierarchical    =   False
       Index           =   -2147483648
       InitialParent   =   ""
-      InitialValue    =   "Name	Version	State	Url	Download	Patreon"
+      InitialValue    =   "Name	Version	State	Url	Download"
       Italic          =   False
       Left            =   0
       LockBottom      =   True
@@ -61,7 +61,7 @@ Begin Window main
       Scope           =   0
       ScrollbarHorizontal=   True
       ScrollBarVertical=   True
-      SelectionType   =   1
+      SelectionType   =   0
       TabIndex        =   1
       TabPanelIndex   =   0
       TabStop         =   True
@@ -164,10 +164,31 @@ Begin Window main
          Width           =   653
       End
    End
+   Begin Timer updateTimer
+      Index           =   -2147483648
+      LockedInPosition=   False
+      Mode            =   0
+      Period          =   1000
+      Scope           =   0
+      TabPanelIndex   =   0
+   End
 End
 #tag EndWindow
 
 #tag WindowCode
+	#tag Event
+		Sub Activate()
+		  'check on start on windows
+		  #if TargetWindows then
+		    if Preferences.checkonstart = "true" and app.loaded = 0 then
+		      refreshAddons
+		    end if
+		    'app started
+		    app.loaded = 1
+		  #endif
+		End Sub
+	#tag EndEvent
+
 	#tag Event
 		Sub Close()
 		  'save the listbox entries
@@ -175,6 +196,12 @@ End
 		  
 		  'save column settings
 		  Preferences.columnsizes = listbox1.ColumnWidths
+		  
+		  'save window state
+		  Preferences.windowWidth = main.Width
+		  Preferences.windowHeight = main.Height
+		  Preferences.windowL = main.Left
+		  Preferences.windowT = main.Top
 		  
 		  'clear download folder
 		  Dim appFolder As FolderItem = SpecialFolder.ApplicationData.Child(gAppName)
@@ -190,6 +217,12 @@ End
 	#tag EndEvent
 
 	#tag Event
+		Sub Maximize()
+		  Preferences.windowMaxed = "true"
+		End Sub
+	#tag EndEvent
+
+	#tag Event
 		Sub Open()
 		  'load the listbox entries
 		  loadListbox
@@ -197,16 +230,47 @@ End
 		  'load the listbox ColumnWidths
 		  ListBox1.ColumnWidths=Preferences.columnsizes
 		  
-		  'check for update
-		  kajuUpdate
+		  'check for update if enabled
+		  if Preferences.autoUpdate = "true" then
+		    PreferencesModule.Log("StartUp", "Checking for APP updates")
+		    Dim updater as Kaju.UpdateChecker.ResultType 
+		    updater = kajuUpdate()
+		  else
+		    PreferencesModule.Log("StartUp", "Checking for APP updates is disabled")
+		  end if
 		  
 		  'menuicons
 		  FileMenuOptions.Icon = resources.toPic(resources.icon_mb_option16)
+		  FileMenuCloud.Icon = resources.toPic(resources.icon_mb_cloud16)
 		  FileQuit.Icon = resources.toPic(resources.icon_mb_close16)
 		  AddonsAddNoncurseaddon.Icon = resources.toPic(resources.icon_mb_addon16)
 		  HelpMenuHelp.Icon = resources.toPic(resources.icon_mb_help16)
 		  HelpMenuAbout.Icon = resources.toPic(resources.icon_mb_about16)
 		  HelpMenuUpdates.Icon = resources.toPic(resources.icon_cell_update16)
+		  
+		  'download function
+		  Dim appFolder As FolderItem = SpecialFolder.ApplicationData.Child(gAppName)
+		  Dim prefFolder As FolderItem = appFolder.Child("download")
+		  
+		  'create missing folder
+		  if prefFolder.Exists = false then
+		    prefFolder.createAsFolder
+		  end if
+		  
+		  'check on start on macos
+		  #if TargetMacOS then
+		    if Preferences.checkonstart = "true" and app.loaded = 0 then
+		      refreshAddons
+		    end if
+		    'app started
+		    app.loaded = 1
+		  #endif
+		End Sub
+	#tag EndEvent
+
+	#tag Event
+		Sub Restore()
+		  Preferences.windowMaxed = "false"
 		End Sub
 	#tag EndEvent
 
@@ -214,7 +278,8 @@ End
 	#tag MenuHandler
 		Function AddonsAddNoncurseaddonElvUI() As Boolean Handles AddonsAddNoncurseaddonElvUI.Action
 			if app.FindRow("ElvUI - tukui.org",main.listbox1) = 0 then
-			main.Listbox1.AddRow("ElvUI - tukui.org", "New", "none", "http://git.tukui.org/Elv/elvui/raw/master/ElvUI/ElvUI.toc")
+			main.Listbox1.AddRow("ElvUI - tukui.org", "New", "none", "https://raw.githubusercontent.com/sysworx/elvui_fork/master/ElvUI/ElvUI.toc")
+			'main.Listbox1.AddRow("ElvUI - tukui.org", "New", "none", "http://git.tukui.org/Elv/elvui/raw/master/ElvUI/ElvUI.toc")
 			main.listbox1.CellTag(main.listbox1.listcount -1, 3) = "http://www.tukui.org/premium.php"
 			main.listbox1.RowPicture(main.listbox1.listcount -1) = resources.toPic(resources.icon_cell_no16)
 			else
@@ -226,8 +291,24 @@ End
 	#tag EndMenuHandler
 
 	#tag MenuHandler
+		Function FileMenuCloud() As Boolean Handles FileMenuCloud.Action
+			ShowDialog(optionsCloud, main)
+			Return True
+			
+		End Function
+	#tag EndMenuHandler
+
+	#tag MenuHandler
+		Function FileMenuOptions() As Boolean Handles FileMenuOptions.Action
+			ShowDialog(options, main)
+			Return True
+			
+		End Function
+	#tag EndMenuHandler
+
+	#tag MenuHandler
 		Function HelpMenuAbout() As Boolean Handles HelpMenuAbout.Action
-			about.ShowModal
+			ShowDialog(about, main)
 			Return True
 			
 		End Function
@@ -235,7 +316,13 @@ End
 
 	#tag MenuHandler
 		Function HelpMenuUpdates() As Boolean Handles HelpMenuUpdates.Action
-			kajuUpdate
+			Dim updater as Kaju.UpdateChecker.ResultType 
+			updater = kajuUpdate()
+			
+			if updater = Kaju.UpdateChecker.ResultType.NoUpdateAvailable then
+			MsgBox "There is no update available!"
+			end if
+			
 			Return True
 			
 		End Function
@@ -244,8 +331,8 @@ End
 
 	#tag Method, Flags = &h0
 		Function createDownloadURL(f As string) As String
-		  'crap method to correct the downloadlink from sourcecode to the new mirror
-		  dim parts() as string = f.Split( "/" )
+		  'crap method to correct the downloadlink from sourcecode to the new mirror this should be handled in httpssocket later
+		  Dim parts() as string = f.Split( "/" )
 		  return "https://addons-origin.cursecdn.com/files/" + parts(4) + "/" + parts(5) + "/" + parts(6)
 		  
 		  
@@ -256,7 +343,7 @@ End
 
 	#tag Method, Flags = &h0
 		Sub DeleteFiles(dir as FolderItem)
-		  'DeleteFiles in a folder
+		  'Delete all files in a folder
 		  for i As Integer = dir.Count DownTo 1 
 		    Dim f As FolderItem = dir.TrueItem(i) 
 		    if f.Directory then DeleteFiles f 
@@ -276,19 +363,25 @@ End
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub getLocalAddonsWin()
+		Sub getLocalAddons()
 		  Dim tocList() as String
 		  Dim tocSearch as new Shell
-		  Dim drive() as String = split(Preferences.addonpath, "\")
-		  Dim addonPath as FolderItem = GetFolderItem(Preferences.addonpath)
+		  Dim addonPath as FolderItem = GetFolderItem(DecodeBase64(Preferences.addonpath))
+		  Dim drive() as String = split(addonPath.NativePath, "\")
 		  Dim addon_before as String
 		  
 		  'count fields from addon path
 		  static pathSep as string = if( TargetWindows, "\", "/" )
 		  dim depth as integer = addonPath.NativePath.CountFields( pathSep )
 		  
-		  'exec windows crap method
-		  tocSearch.Execute drive(0) +" & cd " + Preferences.addonpath + " & dir /b /s *.toc"
+		  'exec os methods to get toc files quickly
+		  #if TargetWindows then
+		    tocSearch.Execute drive(0) +" & cd " + addonPath.NativePath + " & dir /b /s *.toc"
+		  #Elseif TargetMacOS
+		    tocSearch.Execute "find """ + addonPath.NativePath +  """ -type f -name ""*.toc"""
+		  #Else
+		    'Linux?
+		  #endif
 		  
 		  'read lines in a array
 		  dim lines() as string = tocSearch.Result.Split(EndOfLine)
@@ -296,24 +389,28 @@ End
 		    tocList.Append(lines(i).ToText)
 		  next
 		  
-		  'start read process
+		  'start read process for each toc
 		  for i As integer = 0 to tocList.Ubound
 		    
 		    'set the file to read
-		    Dim R as FolderItem = GetFolderItem(tocList(i))
+		    Dim R as FolderItem = GetFolderItem(tocList(i),FolderItem.PathTypeNative)
 		    
 		    'check path depth with addonpath
 		    Dim addondepth as integer = R.NativePath.CountFields( pathSep )
 		    PreferencesModule.Log("TOC found", R.NativePath)
+		    
+		    'special filter for macos (maybe linux too?)
+		    #if TargetMacOS then
+		      addondepth = addondepth-1
+		    #endif
 		    
 		    'filter path depth
 		    if addondepth <= depth+1 then
 		      
 		      Dim toc as string
 		      Dim tocInput As TextInputStream
-		      Dim addon as String
-		      Dim version as String
 		      Dim Package as String
+		      Dim addonCurseUrl as String
 		      
 		      'open the toc file
 		      If (Not R.Directory) And (R.Exists) Then
@@ -323,110 +420,100 @@ End
 		      End If
 		      
 		      'search Addon name
-		      Dim aName as New RegEx
-		      Dim NameMatch as RegExMatch
-		      aName.SearchPattern="^## X-Curse-Project-Name: (.+)"
-		      NameMatch=aName.search(toc)
-		      if NameMatch <> Nil then
-		        'regex the addon name new format
-		        addon = NameMatch.SubExpressionString(1)
-		        PreferencesModule.Log("Addon", "Name: " + NameMatch.SubExpressionString(1) )
-		      else
-		        'regex the addon name old format
+		      Dim addonName as String = app.getRegex(toc, "^## X-Curse-Project-Name: (.+)")
+		      'check Addon name
+		      if addonName = "nomatch" then
 		        PreferencesModule.Log("Error 010", "Name could not be determined, try the old method" )
-		        Dim aNameA as New RegEx
-		        Dim NameMatchA as RegExMatch
-		        aNameA.SearchPattern="^## Title: (.+)"
-		        NameMatchA=aNameA.search(toc)
-		        if NameMatchA <> Nil then
-		          'set the variable
-		          addon = NameMatchA.SubExpressionString(1)
-		          PreferencesModule.Log("Addon", "Name found: " + NameMatchA.SubExpressionString(1) )
-		        else
+		        addonName = app.getRegex(toc, "^## Title: (.+)") 
+		        if addonName = "nomatch" then
 		          PreferencesModule.Log("Error 011", "Old method failed, addon name could not be determined" )
 		        end if
-		      End if
+		      else
+		        PreferencesModule.Log("Addon", "Name found: " + addonName)
+		      end if
 		      
-		      'state label texz
-		      lblState.text = "Found local Addon: " + addon
+		      'state label text
+		      lblState.text = "Found local Addon: " + addonName
 		      
 		      'search Addon version
-		      Dim aVersion as New RegEx
-		      Dim VersionMatch as RegExMatch
-		      aVersion.SearchPattern="^## X-Curse-Packaged-Version: (.+)"
-		      VersionMatch=aVersion.search(toc)
-		      if VersionMatch <> Nil then
-		        'regex the addon name new format
-		        version = VersionMatch.SubExpressionString(1)
-		        PreferencesModule.Log("Addon", "Version: " + VersionMatch.SubExpressionString(1) )
-		      else
-		        'regex the addon name old format
-		        PreferencesModule.Log("Error 020", "version could not be determined, try the old method" )
-		        Dim aVersionA as New RegEx
-		        Dim VersionMatchA as RegExMatch
-		        aVersionA.SearchPattern="^## Version: (.+)"
-		        VersionMatchA=aVersionA.search(toc)
-		        if VersionMatchA <> Nil then
-		          version = VersionMatchA.SubExpressionString(1)
-		          PreferencesModule.Log("Addon", "Version found: " + VersionMatchA.SubExpressionString(1) )
-		        else
-		          'maximal read error (no handling anymore)
-		          PreferencesModule.Log("Error 021", "Old method failed, addon name could not be determined" )
+		      Dim addonVersion as String = app.getRegex(toc, "^## X-Curse-Packaged-Version: (.+)")
+		      'check Addon version
+		      if addonVersion = "nomatch" then
+		        PreferencesModule.Log("Error 020", "Version could not be determined, try the old method" )
+		        addonVersion = app.getRegex(toc, "^## Version: (.+)") 
+		        if addonVersion = "nomatch" then
+		          PreferencesModule.Log("Error 021", "Old method failed, addon version could not be determined" )
 		        end if
-		      End if
-		      
-		      'send the data to sys-worx and get url if available
-		      Dim sender as new HTTPSecureSocket 
-		      sender.Yield = true
-		      Dim senddata As New Dictionary
-		      Dim addonCurseUrl as String
-		      senddata.Value("addon") = addon
-		      Dim result As String
-		      sender.SetFormData(senddata)
-		      result = sender.Post("",5)
-		      
-		      if result = "none" then
-		        addonCurseUrl = "No URL available"
 		      else
-		        addonCurseUrl = result
+		        PreferencesModule.Log("Addon", "Version found: " + addonVersion)
+		      end if
+		      
+		      'send the data to sys-worx and get url if available when activated
+		      if Preferences.cloudSave = "true" then
+		        Dim sender as new HTTPSecureSocket 
+		        sender.Yield = true
+		        Dim senddata As New Dictionary
+		        senddata.Value("addon") = addonName
+		        Dim result As String
+		        sender.SetFormData(senddata)
+		        result = sender.Post(app.swgetAddonURL,5)
+		        'check the result
+		        if result = "none" then
+		          PreferencesModule.Log("WoWAM-Cloud", "No Url found" )
+		          addonCurseUrl = "No URL available"
+		        else
+		          PreferencesModule.Log("WoWAM-Cloud", "Found url in the cloud: " + result )
+		          addonCurseUrl = result
+		        end if
+		      else
+		        PreferencesModule.Log("WoWAM-Cloud", "Cloud check disabled" )
+		        addonCurseUrl = "No URL available"
 		      end if
 		      
 		      'add entry to the listbox
-		      if instr(addon, addon_before) < 1 then
-		        if version.Len > 0 then
-		          Listbox1.AddRow(addon, version, "none", addonCurseUrl)
-		          listbox1.RowPicture(main.listbox1.listcount -1) = resources.toPic(resources.icon_cell_no16)
+		      if instr(addonName, addon_before) < 1 then
+		        if addonVersion <> "" then
+		          if addonVersion = "nomatch" then
+		            PreferencesModule.Log("Addon", "Deleted because no versionnumber determined" )
+		          else
+		            Listbox1.AddRow(addonName, addonVersion, "none", addonCurseUrl)
+		            listbox1.CellTag(main.listbox1.listcount -1,3) = "none"
+		            listbox1.RowPicture(main.listbox1.listcount -1) = resources.toPic(resources.icon_cell_no16)
+		          end if
 		        else
 		          PreferencesModule.Log("Addon", "Deleted because no versionnumber determined" )
 		        end if
 		      else
 		        PreferencesModule.Log("Addon", "Deleted because several times found" )
 		      end if 
-		      
-		      addon_before = addon
-		      addon = ""
-		      version= ""
+		      'reset variables
+		      addon_before = addonName
+		      addonName = ""
+		      addonVersion= ""
 		      package = ""
 		      toc = ""
 		    else
 		      PreferencesModule.Log("Addon", "Deleted because path is too deep")
 		    end if
 		  next
-		  
+		  'reset state label
 		  lblState.text = ""
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub kajuUpdate()
+		Function kajuUpdate() As Kaju.UpdateChecker.ResultType
 		  'updater
 		  Dim appFolder As FolderItem = SpecialFolder.ApplicationData.Child(gAppName)
 		  dim updater as new Kaju.UpdateChecker(appFolder)
 		  updater.ServerPublicRSAKey = "30820120300D06092A864886F70D01010105000382010D00308201080282010100BE309D13C50CB40272B96F0604D12C4B08245B0DF0E44ACDA66169AF1479BC02BC042E84C761D60B5B4350A7FB60F1D2CF999FB44AD95763152C732C6105004144C4F82AA6402A5F31421FC25EB7C60C7A4C7B598A12366DF0172FFBFB2F5A88FCABE73310D8B941215A5B8CCA937B662D2A6FF6E2B06879EFAEC98AABF3A733944CE7D37E2ABA861830E7867D029FAB69745DD5CFEF93A92CF17A57299A1D385B5C614DE0927DFE9DC430D2F09C854EFBD00BBEA6162A449EFE7824AF38A53EF32935DC4355454A9ED0DF8B2C5EFC6C300DDA55BD5A4FCC22FBD7789DA68074F025F3452F34CC4FE25D3C61DC02DF4BD402F3755650F45BF7146287CF4FBACB020111"
-		  updater.UpdateURL = "https://wowam.sys-worx.net/UpdateInformation.json"
-		  PreferencesModule.Log("StartUp", "Checking for APP updates")
+		  updater.UpdateURL = app.swUpateURL
 		  updater.Execute
-		End Sub
+		  'prepare Update result
+		  Dim result as Kaju.UpdateChecker.ResultType = updater.Result
+		  return result
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
@@ -440,10 +527,10 @@ End
 		  'set addonlist
 		  listboxFile = prefFolder.Child(prefName)
 		  
+		  'read file
 		  If listboxFile <> Nil then
 		    If listboxFile.Exists Then
 		      PreferencesModule.Log("StartUp", "Loading Listbox-File: " + listboxFile.NativePath)
-		      // Be aware that TextInputStream.Open coud raise an exception
 		      Dim t As TextInputStream
 		      Try
 		        t = TextInputStream.Open(listboxFile)
@@ -458,23 +545,12 @@ End
 		    End If
 		  end if
 		  
+		  'fill listbox
 		  dim lines() as string =entries.Split(EndOfLine)
 		  for i as integer = 0 to lines.Ubound -1
 		    Dim entry() as String = split(lines(i), ";")
 		    main.Listbox1.AddRow(entry(0), entry(1), "none", entry(2))
-		    
-		    'check for celltag on url cause update 0.1.5 and set none for addons.dat integrity
-		    Dim count as integer = UBound(entry)
-		    if count > 2 then
-		      if main.listbox1.CellTag(i,3) = "" then
-		        main.listbox1.CellTag(i,3) = "none"
-		      else 
-		        main.listbox1.CellTag(i,3) = entry(3)
-		      end if
-		    else
-		      main.listbox1.CellTag(i,3) = "none"
-		    end if
-		    
+		    main.listbox1.CellTag(i,3) = entry(3)
 		    main.listbox1.RowPicture(i) = resources.toPic(resources.icon_cell_no16)
 		  next
 		  
@@ -484,157 +560,58 @@ End
 
 	#tag Method, Flags = &h0
 		Sub refreshAddons()
+		  'check internet Connection
+		  If helper.IsConnected = false then
+		    msgbox "It seems you dont have a valid internet connection, please check this!"
+		    Quit
+		  End if
+		  
 		  'reset icons
 		  for i as integer = 0 to main.listbox1.listcount -1
 		    main.listbox1.RowPicture(i) = resources.toPic(resources.icon_cell_no16)
 		  next
 		  
-		  'set HTTPSocket
-		  Dim h as new whttps
-		  h.HTTPProxyAddress = app.proxy_server
-		  h.HTTPProxyPort = app.proxy_port
-		  Dim updates as integer = 0
-		  h.Yield = true
+		  'reset label
+		  lblState.text = ""
 		  
+		  'disable UI
+		  tb_main.tb_refresh.Enabled = false
+		  tb_main.tb_update.Enabled = false
+		  tb_main.tb_delete.Enabled = false
+		  tb_main.tb_scanlocal.Enabled = false
+		  tb_main.tb_new.Enabled = false
+		  tb_main.tb_edit.Enabled = false
+		  'disable listbox
+		  Listbox1.Enabled = false
+		  
+		  'reset updatecounter
+		  updates = 0
 		  
 		  'set progressbarMax to listbox
 		  proBar.Maximum =  main.listbox1.listCount
+		  probar.Visible = true
 		  App.refreshIsRunning = 1
+		  updateCount = 0
 		  
+		  'create threads for entries
 		  for i as integer = 0 to main.listbox1.listcount -1
-		    'disable toolbutton
-		    tb_main.tb_refresh.Enabled = false
-		    tb_main.tb_update.Enabled = false
-		    tb_main.tb_delete.Enabled = false
-		    tb_main.tb_scanlocal.Enabled = false
-		    tb_main.tb_new.Enabled = false
-		    tb_main.tb_edit.Enabled = false
-		    'disable listbox
-		    Listbox1.Enabled = false
-		    'statbar state
-		    lblState.text = "Checking " + listbox1.Cell(i,0)
-		    probar.Visible = true
-		    proBar.Value = proBar.Value +1
-		    
 		    if listbox1.Cell(i,3) = "No URL available" then
 		      listbox1.RowPicture(i) = resources.toPic(resources.icon_cell_nok16)
 		      PreferencesModule.Log("Refresh", "-------- Starting Refresh Procedure for " + listbox1.Cell(i,0) + " -----------------")
 		      PreferencesModule.Log("Refresh","No URL availiable")
 		      PreferencesModule.Log("Refresh", "-------- End of Refresh Procedure for " + listbox1.Cell(i,0) + " -------------------")
 		    else
-		      'curse operations
-		      if listbox1.Cell(i,3).InStr("https://mods.curse.com/addons/wow") >0 then 
-		        h.SetRequestHeader("User-Agent:", "curl/7.21.0 (i686-pc-linux-gnu) libcurl/7.21.0 OpenSSL/0.9.8o zlib/1.2.3.4 libidn/1.18")
-		        PreferencesModule.Log("Refresh", "-------- Starting Refresh Procedure for " + listbox1.Cell(i,0) + " -----------------")
-		        Dim source as String
-		        Dim DownloadSource as String
-		        Dim AddonVersion as String 
-		        Dim DownloadLink as String 
-		        Dim DownloadPage as String
-		        
-		        'get sourcecode
-		        source=h.Get(main.listbox1.Cell(i,3),50)
-		        'search AddonVersion
-		        AddonVersion = app.getRegex(source,"<li class=""newest-file"">[^:]+: ([^<]+)")
-		        PreferencesModule.Log("Refresh", "Addon-Version: " + AddonVersion)
-		        listbox1.Cell(i,2) = AddonVersion
-		        'search DownloadPage
-		        DownloadPage = app.getRegex(source,"<tr class=""even""><td><a href=""(.+)""")
-		        DownloadPage = "https://mods.curse.com" + DownloadPage
-		        PreferencesModule.Log("Refresh", "Download-Page: " + DownloadPage)
-		        'Search DownloadLink
-		        DownloadSource = h.Get(DownloadPage,50)
-		        'regex old "data-href=""(.+)"" class=""download-link""" 
-		        DownloadLink = app.getRegex(DownloadSource,"data-href=""(.+)"" class=""download-link""")
-		        PreferencesModule.Log("Refresh", "created DownloadLink: " + DownloadLink)
-		        'correct the download link to https
-		        if DownloadLink = "nomatch" then
-		          listbox1.Cell(i,4) = "link catch failed (No Curse Addon?)"
-		        else
-		          listbox1.Cell(i,4) = createDownloadURL(DownloadLink)
-		        end if
-		        'check versions
-		        if listbox1.Cell(i,2) > listbox1.Cell(i,1) then
-		          listbox1.RowPicture(i) = resources.toPic(resources.icon_cell_update16)
-		          updates = 1
-		          PreferencesModule.Log("Refresh", "Update available: Yes")
-		          updateCount = updateCount+1
-		        else
-		          listbox1.RowPicture(i) = resources.toPic(resources.icon_cell_ok16)
-		          PreferencesModule.Log("Refresh", "Update available: No")
-		        end if 
-		        'new addon
-		        if listbox1.Cell(i,1) = "New" then
-		          listbox1.RowPicture(i) = resources.toPic(resources.icon_cell_update16)
-		          updates = 1
-		          updateCount = updateCount+1
-		          PreferencesModule.Log("Refresh", "Update Type: New Install")
-		        end if
-		        PreferencesModule.Log("Refresh", "-------- End of Refresh Procedure for " + listbox1.Cell(i,0) + " -------------------")
-		      end if
-		      'end curse operations
-		      
-		      'git operations for elvui
-		      if listbox1.Cell(i,3).InStr("http://git.tukui.org/elv") >0 then 
-		        PreferencesModule.Log("Refresh", "-------- Starting Refresh Procedure for " + listbox1.Cell(i,0) + " -----------------")
-		        Dim source as String
-		        Dim AddonVersion as String 
-		        Dim DownloadLink as String 
-		        Dim ht as new HTTPSocket
-		        'get sourcecode
-		        source=ht.Get(main.listbox1.Cell(i,3),50)
-		        AddonVersion = app.getRegex(source, "^## Version: (.+)")
-		        DownloadLink = "http://www.tukui.org/downloads/elvui-" + AddonVersion + ".zip"
-		        PreferencesModule.Log("Refresh", "Addon-Version: " + AddonVersion)
-		        PreferencesModule.Log("Refresh", "Not needed")
-		        listbox1.Cell(i,2) = AddonVersion
-		        listbox1.Cell(i,4) = DownloadLink
-		        PreferencesModule.Log("Refresh", "created DownloadLink: " + DownloadLink)
-		        
-		        'check versions
-		        if listbox1.Cell(i,2) > listbox1.Cell(i,1) then
-		          listbox1.RowPicture(i) = resources.toPic(resources.icon_cell_update16)
-		          updates = 1
-		          PreferencesModule.Log("Refresh", "Update available: Yes")
-		          updateCount = updateCount+1
-		        else
-		          listbox1.RowPicture(i) = resources.toPic(resources.icon_cell_ok16)
-		          PreferencesModule.Log("Refresh", "Update available: No")
-		        end if 
-		        'new addon
-		        if listbox1.Cell(i,1) = "New" then
-		          listbox1.RowPicture(i) = resources.toPic(resources.icon_cell_update16)
-		          updates = 1
-		          updateCount = updateCount+1
-		          PreferencesModule.Log("Refresh", "Update Type: New Install")
-		        end if
-		        PreferencesModule.Log("Refresh", "-------- End of Refresh Procedure for " + listbox1.Cell(i,0) + " -------------------")
-		      end if
-		      'end git operations
+		      'start thread
+		      main.listbox1.Cell(i,2) = "Searching..."
+		      Dim t as new uThread(main.listbox1.Cell(i,0), main.listbox1.Cell(i,1), main.listbox1.Cell(i,3),i)
+		      t.run
+		      wUThread().Append(t)
 		    end if
-		    
 		  next
-		  'check if updatebutton musst be availiable
-		  if updates = 1 then
-		    tb_main.tb_update.Enabled = true
-		  else
-		    tb_main.tb_update.Enabled = false
-		  end if
 		  
-		  'enable Refresh button again
-		  tb_main.tb_refresh.Enabled = true
-		  tb_main.tb_delete.Enabled = true
-		  tb_main.tb_scanlocal.Enabled = true
-		  tb_main.tb_new.Enabled = true
-		  tb_main.tb_edit.Enabled = true
-		  App.refreshIsRunning = 0
-		  'enable listbox again
-		  Listbox1.Enabled = true
-		  'reset progressbar
-		  proBar.Value = 0
-		  probar.Visible = false
-		  'setlabel
-		  lblState.text = ""
+		  'start thread timer
+		  updateTimer.Mode = Timer.ModeMultiple
+		  updateTimer.Enabled = True
 		End Sub
 	#tag EndMethod
 
@@ -699,6 +676,12 @@ End
 		  'set progressbarMax to listbox
 		  proBar.Maximum =  updateCount
 		  
+		  'check internet Connection
+		  If helper.IsConnected = false then
+		    msgbox "It seems you dont have a valid internet connection, please check this!"
+		    Quit
+		  End if
+		  
 		  'to disable contextmenu
 		  app.refreshIsRunning = 1 
 		  
@@ -716,13 +699,7 @@ End
 		  Dim appFolder As FolderItem = SpecialFolder.ApplicationData.Child(gAppName)
 		  Dim prefFolder As FolderItem = appFolder.Child("download")
 		  
-		  'create missing folder
-		  if prefFolder.Exists = false then
-		    prefFolder.createAsFolder
-		  end if
-		  
 		  for i as integer = 0 to listbox1.listcount -1
-		    'statbar state
 		    'download all new addons
 		    if listbox1.Cell(i,2) > listbox1.Cell(i,1) or listbox1.Cell(i,1) = "New" then
 		      if  listbox1.Cell(i,2) = "none" then
@@ -730,7 +707,7 @@ End
 		        if listbox1.Cell(i,4) = "link catch failed (No Curse Addon?)" then
 		        else
 		          PreferencesModule.Log("Update", "-------- Starting Download Procedure for " + listbox1.Cell(i,0) + " -----------------")
-		          http = new Downloader
+		          Dim http as new Downloader
 		          http.Yield = true
 		          
 		          dim link as string = listbox1.Cell(i,4)
@@ -742,18 +719,19 @@ End
 		          else
 		            zipname = GetFilename(link)
 		          end if
-		          System.DebugLog("zipname: " + zipname)
 		          PreferencesModule.Log("Update", "ZipName: " + zipname)
 		          loadfile = prefFolder.Child(zipname)
 		          System.DebugLog("loadfile: " + loadfile.NativePath)
 		          PreferencesModule.Log("Update", "Destination Path: " + loadfile.NativePath)
 		          if listbox1.Cell(i,3).InStr("https") >0 then 
 		            http.Get(link, loadfile)
+		            http.SetRequestHeader("User-Agent:", "Anything")
 		            'set the zipfilename 
 		            http.zipFile = loadfile
 		            http.i = i
 		          else
 		            Dim httpN as new DownloaderN
+		            httpN.Yield = true
 		            httpN.Get(link, loadfile)
 		            'set the zipfilename 
 		            httpN.zipFile = loadfile
@@ -777,15 +755,23 @@ End
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
-		http As Downloader
-	#tag EndProperty
-
-	#tag Property, Flags = &h0
 		loadcount As Integer
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
 		updateCount As Integer = 0
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		updates As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		#tag Note
+			_
+			
+		#tag EndNote
+		wUThread() As uThread
 	#tag EndProperty
 
 
@@ -795,9 +781,7 @@ End
 	#tag Event
 		Sub DoubleClick()
 		  'doubleclick edit thing
-		  if listbox1.Cell(listbox1.ListIndex,3).InStr("https://mods.curse.com/addons/wow") =0 then 
-		    MsgBox "This is no Curse.com Addon, you can't change the Link to the addon!"
-		  else
+		  if listbox1.Cell(listbox1.ListIndex,3).InStr("https://mods.curse.com/addons/wow") > 0 or listbox1.Cell(listbox1.ListIndex,3) = "No URL available" then 
 		    if listbox1.Cell(listbox1.ListIndex,0).Len < 26 then
 		      if listbox1.ListCount > 0 then 
 		        'check the listbox and open edit window
@@ -805,10 +789,14 @@ End
 		        edit_addon.txt_url.text = listbox1.Cell(listbox1.ListIndex,3)
 		        edit_addon.listboxRow = listbox1.ListIndex
 		        edit_addon.listboxAddon =  listbox1.Cell(listbox1.ListIndex,0) 
-		        edit_addon.ShowModal
+		        'edit_addon.ShowModal
+		        ShowDialog(edit_addon, main)
 		      end if 
 		    end if
+		  else
+		    MsgBox "This is no Curse.com Addon, you can't change the Link to the addon!"
 		  end if
+		  
 		End Sub
 	#tag EndEvent
 	#tag Event
@@ -850,13 +838,29 @@ End
 		        edit_addon.txt_url.text = listbox1.Cell(listbox1.ListIndex,3)
 		        edit_addon.listboxRow = listbox1.ListIndex
 		        edit_addon.listboxAddon =  listbox1.Cell(listbox1.ListIndex,0) 
-		        edit_addon.ShowModal
+		        'edit_addon.ShowModal
+		        ShowDialog(edit_addon, main)
 		      end if 
 		    Case "Delete Addon"
 		      'delete Addons
+		      'delete rows from listbox
 		      for i as integer=listbox1.listcount-1 downto 0
 		        if listbox1.selected(i) then
-		          listbox1.removeRow(i)
+		          'check versions
+		          if listbox1.Cell(i,2) > listbox1.Cell(i,1) or listbox1.Cell(i,1) = "New" then
+		            if  listbox1.Cell(i,2) = "none" then
+		              listbox1.removeRow(i)
+		            else
+		              'correct update count if the deleted addons needs updates
+		              updateCount = updateCount -1 
+		              listbox1.removeRow(i)
+		              'set progressbarMax to listbox and update label
+		              proBar.Maximum =  updateCount
+		              lblState.text = updateCount.ToText + " update(s) available..."
+		            end if
+		          else
+		            listbox1.removeRow(i)
+		          end if
 		        end if
 		      next
 		    Case "Open Website of the Addon"
@@ -887,6 +891,7 @@ End
 		  tb_main.tb_scanlocal.icon = resources.toPic(resources.icon_tb_search32)
 		  tb_main.tb_refresh.icon = resources.toPic(resources.icon_tb_refresh32)
 		  tb_main.tb_update.icon = resources.toPic(resources.icon_tb_update32)
+		  tb_main.tb_curse.icon = Resources.toPic(Resources.icon_tb_curse32)
 		  
 		  
 		End Sub
@@ -909,12 +914,12 @@ End
 		    'show the add_addon form
 		    Dim addAddon as new Window 
 		    addAddon = add_addon
-		    addAddon.ShowModal
+		    'addAddon.ShowModalWithin(main)
+		    ShowDialog(addAddon, main)
 		  Case "tb_edit"
 		    'link check
-		    if listbox1.Cell(listbox1.ListIndex,3).InStr("https://mods.curse.com/addons/wow") =0 then 
-		      MsgBox "This is no Curse.com Addon, you can't change the Link to the addon!"
-		    else
+		    'doubleclick edit thing
+		    if listbox1.Cell(listbox1.ListIndex,3).InStr("https://mods.curse.com/addons/wow") > 0 or listbox1.Cell(listbox1.ListIndex,3) = "No URL available" then 
 		      if listbox1.Cell(listbox1.ListIndex,0).Len < 26 then
 		        if listbox1.ListCount > 0 then 
 		          'check the listbox and open edit window
@@ -922,9 +927,12 @@ End
 		          edit_addon.txt_url.text = listbox1.Cell(listbox1.ListIndex,3)
 		          edit_addon.listboxRow = listbox1.ListIndex
 		          edit_addon.listboxAddon =  listbox1.Cell(listbox1.ListIndex,0) 
-		          edit_addon.ShowModal
+		          'edit_addon.ShowModal
+		          ShowDialog(edit_addon, main)
 		        end if 
 		      end if
+		    else
+		      MsgBox "This is no Curse.com Addon, you can't change the Link to the addon!"
 		    end if
 		  Case "tb_scanlocal"
 		    'check listbox empty
@@ -935,27 +943,120 @@ End
 		      Case md1.ActionButton
 		        'ok pressed    
 		        ListBox1.DeleteAllRows 
-		        getLocalAddonsWin
+		        getLocalAddons
 		      End select
 		    else
 		      'listbox is empty no warning here
 		      ListBox1.DeleteAllRows 
-		      getLocalAddonsWin
+		      getLocalAddons
 		    end if
 		  Case "tb_refresh"
 		    'start the addon refresh
 		    refreshAddons
 		  Case "tb_delete"
+		    'delete Addons
 		    'delete rows from listbox
 		    for i as integer=listbox1.listcount-1 downto 0
 		      if listbox1.selected(i) then
-		        listbox1.removeRow(i)
+		        'check versions
+		        if listbox1.Cell(i,2) > listbox1.Cell(i,1) or listbox1.Cell(i,1) = "New" then
+		          if  listbox1.Cell(i,2) = "none" then
+		            listbox1.removeRow(i)
+		          else
+		            'correct update count if the deleted addons needs updates
+		            updateCount = updateCount -1 
+		            listbox1.removeRow(i)
+		            'set progressbarMax to listbox and update label
+		            proBar.Maximum =  updateCount
+		            lblState.text = updateCount.ToText + " update(s) available..."
+		          end if
+		        else
+		          listbox1.removeRow(i)
+		        end if
 		      end if
 		    next
 		  Case "tb_update"
 		    'start the downloader method
 		    updateAddons
+		  Case "tb_curse"
+		    MsgBox "Note: We are not affiliates of Curse.com and have no revenue through this software. Please support Curse.com and their great service."
+		    ShowURL("https://mods.curse.com/premium/plan")
 		  End Select
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events updateTimer
+	#tag Event
+		Sub Action()
+		  for i as integer = wUThread.Ubound DownTo 0
+		    
+		    if wUThread(i).State = Thread.NotRunning then
+		      'count probar
+		      proBar.Value = proBar.Value +1
+		      
+		      main.listbox1.Cell(wUThread(i).lbEntry,2) = wUThread(i).rAddonVersion
+		      main.listbox1.Cell(wUThread(i).lbEntry,4) = wUThread(i).rDownloadLink
+		      Listbox1.Refresh
+		      
+		      'new addon
+		      if listbox1.Cell(wUThread(i).lbEntry,1) = "New" then
+		        updates = 1
+		        updateCount = updateCount+1
+		        listbox1.RowPicture(wUThread(i).lbEntry) = resources.toPic(resources.icon_cell_update16)
+		      else 
+		        'check versions
+		        if listbox1.Cell(wUThread(i).lbEntry,2) > listbox1.Cell(wUThread(i).lbEntry,1) then
+		          updates = 1
+		          updateCount = updateCount+1
+		          listbox1.RowPicture(wUThread(i).lbEntry) = resources.toPic(resources.icon_cell_update16)
+		        else
+		          listbox1.RowPicture(wUThread(i).lbEntry) = resources.toPic(resources.icon_cell_ok16)
+		        end if 
+		      end if
+		      
+		      'do logs
+		      PreferencesModule.Log("Refresh", "-------- Starting Refresh Procedure for " + wUThread(i).gAddon + " -----------------")
+		      PreferencesModule.Log("Refresh", "Addon-Version: " + wUThread(i).rAddonVersion)
+		      PreferencesModule.Log("Refresh", "Support-Link " + wUThread(i).rPatreon)
+		      PreferencesModule.Log("Refresh", "Download-Page: " + wUThread(i).gUrl)
+		      PreferencesModule.Log("Refresh", "created Download-Link: " + wUThread(i).rDownloadLink)
+		      PreferencesModule.Log("Refresh", "-------- End of Refresh Procedure for " + wUThread(i).gAddon + " -------------------")
+		      
+		      'remove
+		      wUThread.Remove(i)
+		    end if
+		    
+		  next
+		  
+		  if wUThread.Ubound < 0 then
+		    me.Enabled = false
+		    
+		    'enable Refresh button again
+		    tb_main.tb_refresh.Enabled = true
+		    tb_main.tb_delete.Enabled = true
+		    tb_main.tb_scanlocal.Enabled = true
+		    tb_main.tb_new.Enabled = true
+		    tb_main.tb_edit.Enabled = true
+		    App.refreshIsRunning = 0
+		    
+		    'enable listbox again
+		    Listbox1.Enabled = true
+		    
+		    'reset progressbar
+		    proBar.Value = 0
+		    probar.Visible = false
+		    App.refreshIsRunning = 0
+		    
+		    'check if updatebutton have to be availiable
+		    if updates = 1 then
+		      tb_main.tb_update.Enabled = true
+		      lblState.text = updateCount.ToText + " update(s) available..."
+		    else
+		      tb_main.tb_update.Enabled = false
+		      lblState.text = "No updates available..."
+		    end if
+		    
+		  end if
 		End Sub
 	#tag EndEvent
 #tag EndEvents
@@ -1178,6 +1279,11 @@ End
 		Name="updateCount"
 		Group="Behavior"
 		InitialValue="0"
+		Type="Integer"
+	#tag EndViewProperty
+	#tag ViewProperty
+		Name="updates"
+		Group="Behavior"
 		Type="Integer"
 	#tag EndViewProperty
 	#tag ViewProperty

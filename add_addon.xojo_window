@@ -230,14 +230,13 @@ End
 		      main.Listbox1.AddRow(AddonName, "New", AddonVersion, url)
 		      main.listbox1.CellTag(main.listbox1.listcount -1, 3) = app.getPatreonLink(source)
 		      main.listbox1.RowPicture(main.listbox1.listcount -1) = resources.toPic(resources.icon_cell_no16)
-		      
 		      'send the data to sys-worx
 		      senddata.Value("addon") = AddonName
 		      senddata.Value("url") = url
 		      PreferencesModule.Log("Add", "Send data to the WOWAM-Cloud: " + AddonName + " / " + url)
 		      Dim result As String
 		      sender.SetFormData(senddata)
-		      result = sender.Post("",5) // Synchronous
+		      result = sender.Post(app.swAddonsURL,5) // Synchronous
 		      PreferencesModule.Log("Add", "-------- End Add Procedure for a new Addon ----------------------")
 		      'close form
 		      add_addon.Close

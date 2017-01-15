@@ -8,7 +8,7 @@ Inherits HttpSocket
 		  main.proBar.Value = main.proBar.Value +1
 		  main.loadcount = main.loadcount + 1
 		  
-		  Dim addonPath as FolderItem = GetFolderItem(Preferences.addonpath)
+		  Dim addonPath as FolderItem = GetFolderItem(DecodeBase64(Preferences.addonpath))
 		  
 		  PreferencesModule.Log("Update", "Download Complete: " + url + httpStatus.ToText)
 		  PreferencesModule.Log("Update", "Extracting addon to: " + addonPath.NativePath)

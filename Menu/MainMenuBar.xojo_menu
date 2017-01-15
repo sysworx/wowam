@@ -13,7 +13,14 @@ Begin Menu MainMenuBar
          AutoEnable = True
          Visible = True
       End
-      Begin MenuItem UntitledSeparator
+      Begin MenuItem FileMenuCloud
+         SpecialMenu = 0
+         Text = "Cloud-Sync"
+         Index = -2147483648
+         AutoEnable = False
+         Visible = True
+      End
+      Begin MenuItem Separator0
          SpecialMenu = 0
          Text = "-"
          Index = -2147483648
@@ -65,7 +72,7 @@ Begin Menu MainMenuBar
          AutoEnable = True
          Visible = True
       End
-      Begin MenuItem UntitledSeparator1
+      Begin MenuItem Separator1
          SpecialMenu = 0
          Text = "-"
          Index = -2147483648
