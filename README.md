@@ -18,9 +18,9 @@ WoW Addon Manager has its own update system to keep itself up-to-date, the tool 
 WoW Addon Manager is a free project with which I as always no revenue, still wants to achieve. If you want to buy coffees, there is the donation button on my side.
 
 # Installation
-Our World of Warcraft Addon Manager is in development now, code will be releasen when its ready. You will need Microsoft Visual C++ 2015 (x86) Runtime to run the tool on Windows.
-https://www.microsoft.com/de-de/download/details.aspx?id=48145
+Our World of Warcraft Addon Manager is in development now, code will be releasen when its ready. You will need Microsoft Visual C++ 2015 (x86) Runtime to run the tool on Windows. (https://www.microsoft.com/de-de/download/details.aspx?id=48145)
 
+# Download Binaries
 https://www.sys-worx.net/software/wow-addon-manager/
 
 # Bugs
