@@ -18,6 +18,7 @@ Our World of Warcraft Addon Manager is in development now, code will be releasen
 
 # Download Binaries
 https://www.sys-worx.net/downloads/file/5-wow-addon-manager-win/
+
 https://www.sys-worx.net/downloads/file/6-wow-addon-manager-mac/
 
 # Bugs
