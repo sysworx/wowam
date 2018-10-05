@@ -1,7 +1,7 @@
 # Wow Addon Manager
 The WoW Addon Manager is a small help tool for the MMORPG World of Warcraft. The tool serves as an alternative for the Curse client, which is currently only available for Windows.
 
-![alt text](https://www.sys-worx.net/wp-content/uploads/2016/10/wowam.png "World of Warcraft Addon Manager")
+![alt text](https://www.sys-worx.net/attachment/9-wowam-png/ "World of Warcraft Addon Manager")
 
 The World of Warcraft Addon Manager downloads the Curse.com addons, but the Curse Client's databases are not tapped here, as this is not legal. Our program collects the data directly from the website, it also collects Patreon links and offers you to support the developers and visit the homepage of the addons. With the support of Curse, we have clarified with Hellfir3 that this procedure is ok, as long as no viruses are spread or revenue generated.
 
